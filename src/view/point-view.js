@@ -1,10 +1,13 @@
-export default class PointView {
+import AbstractView from '../framework/view/abstract-view.js';
+
+export default class PointView extends AbstractView {
   constructor(point) {
+    super();
     this.point = point;
-    this.element = null;
+    this._callback = {};
   }
 
-  getTemplate() {
+  get template() {
     const { type, destination, dateFrom, dateTo, basePrice, offers, isFavorite } = this.point;
 
     const startDate = new Date(dateFrom);
@@ -17,7 +20,6 @@ export default class PointView {
     const hours = Math.floor(durationMs / (1000 * 60 * 60));
     const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
     const duration = `${hours.toString().padStart(2, '0')}H ${minutes.toString().padStart(2, '0')}M`;
-
     const offersHtml = offers.length ? `
       <div class="event__selected-offers">
         ${offers.map((offer) => `
@@ -69,16 +71,13 @@ export default class PointView {
     `;
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = this.createElement(this.getTemplate());
-    }
-    return this.element;
+  setRollupClickHandler(callback) {
+    this._callback.rollupClick = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', callback);
   }
 
-  createElement(template) {
-    const newElement = document.createElement('div');
-    newElement.innerHTML = template;
-    return newElement.firstElementChild;
+  setFavoriteClickHandler(callback) {
+    this._callback.favoriteClick = callback;
+    this.element.querySelector('.event__favorite-btn').addEventListener('click', callback);
   }
 }
